@@ -46,7 +46,7 @@ function createYouTubeObject(width, height, videoId) {
 	iframe.style.border = "0px";
 	// https://developers.google.com/youtube/player_parameters?playerVersion=HTML5#Parameters
 	var parameters = {
-		autoplay: 1,
+		autoplay: 0,
 		controls: 0,
 		disablekb: 1,
 		enablejsapi: 1,
@@ -67,21 +67,10 @@ function createYouTubeObject(width, height, videoId) {
 	return new THREE.CSS3DObject(divContainer);
 }
 
-var videoIds = [
-	"K5A-xPxr5L8",
-	"NtSgWZbL_kE",
-	"rLy-AwdCOmI",
-	"q2pBM3pbN8M",
-	"8jmQ6wCDZiY",
-	"38PPxQMVPA0",
-	"seMCsnyNRBE",
-	"NzyhVMr9i7o",
-	// "EvQL0lSNprw"
-];
 var radius = 600;
 var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
-for (var i = 0; i < videoIds.length; i += 1) {
-	var id = videoIds[i];
+// for (var i = 0; i < 8; i += 1) {
+for (var i = 0; i < 1; i += 1) {
 	var angle = i * Math.PI / 4;
 
 	// Circle in YZ plane
@@ -89,11 +78,20 @@ for (var i = 0; i < videoIds.length; i += 1) {
 	var y = radius * Math.sin(angle);
 	var z = radius * Math.cos(angle);
 
-	// TODO: Miscalculated something small here - remove smudge factor
-	var object = createYouTubeObject(1000, sideLength + 40, id);
-	object.position.set(x, y, z);
-	object.lookAt(new THREE.Vector3(0, 0, 0));
-	scene.add(object);	
+	// for (var a = 0; a < 3; a += 1) {
+	for (var a = 0; a < 1; a += 1) {
+		var id = videoIds[THREE.Math.randInt(0, videoIds.length)];
+		var pos = new THREE.Vector3(x, y, z);
+		pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), a * 45);
+		// TODO: Miscalculated something small here - remove smudge factor
+		var object = createYouTubeObject(750, sideLength + 40, id);
+		object.position.copy(pos);
+		object.lookAt(new THREE.Vector3(0, 0, 0));
+		scene.add(object);	
+	}
+
+
+
 }
 
 
