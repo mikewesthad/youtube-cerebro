@@ -69,8 +69,7 @@ function createYouTubeObject(width, height, videoId) {
 
 var radius = 600;
 var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
-// for (var i = 0; i < 8; i += 1) {
-for (var i = 0; i < 1; i += 1) {
+for (var i = 0; i < 8; i += 1) {
 	var angle = i * Math.PI / 4;
 
 	// Circle in YZ plane
@@ -78,8 +77,7 @@ for (var i = 0; i < 1; i += 1) {
 	var y = radius * Math.sin(angle);
 	var z = radius * Math.cos(angle);
 
-	// for (var a = 0; a < 3; a += 1) {
-	for (var a = 0; a < 1; a += 1) {
+	for (var a = 0; a < 3; a += 1) {
 		var id = videoIds[THREE.Math.randInt(0, videoIds.length)];
 		var pos = new THREE.Vector3(x, y, z);
 		pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), a * 45);
