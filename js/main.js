@@ -1,44 +1,5 @@
 // -- GLOBALS ------------------------------------------------------------------
 
-// -- ADD YOUTUBE VIDEOS -------------------------------------------------------
-
-function createYouTubeObject(width, height, videoId) {
-	// Div to hold everything
-	var divContainer = document.createElement("div");
-	// Div to capture all mouse events
-	var pointerCaptureDiv = document.createElement("div");
-	pointerCaptureDiv.style.position = "absolute";
-	pointerCaptureDiv.style.background = "transparent";
-	pointerCaptureDiv.style.zIndex = 1; // Sit on top of iframe
-	pointerCaptureDiv.style.width = width + "px";
-	pointerCaptureDiv.style.height = height + "px";
-	// YouTube video iframe
-	var iframe = document.createElement("iframe");
-	iframe.style.width = width + "px";
-	iframe.style.height = height + "px";
-	iframe.style.border = "0px";
-	// https://developers.google.com/youtube/player_parameters?playerVersion=HTML5#Parameters
-	var parameters = {
-		autoplay: 0,
-		controls: 0,
-		disablekb: 1,
-		enablejsapi: 1,
-		loop: 1,
-		showinfo: 0,
-		cc_load_policy: 1
-	};
-	var url = "https://www.youtube.com/embed/" + videoId + "?";
-	for (var key in parameters) {
-		url += key + "=" + parameters[key] + "&";
-	}
-	url = url.slice(0, -1); // Remove trailing "&"
-	iframe.src = url;
-	// Put the DOM elements together
-	divContainer.appendChild(pointerCaptureDiv);
-	divContainer.appendChild(iframe);
-	// Return a CSS3DObject
-	return new THREE.CSS3DObject(divContainer);
-}
 var cssScene, glScene, camera, glRenderer, css3dRenderer, controls, raycaster;
 var isDebug = false;
 var interactiveVideos = [];
