@@ -1,32 +1,4 @@
-// -- THREEJS SETUP ------------------------------------------------------------
 // -- GLOBALS ------------------------------------------------------------------
-
-var scene = new THREE.Scene();
-
-var fov = 75;
-var w = window.innerWidth;
-var h = window.innerHeight;
-var aspectRatio = w / h;
-var nearClip = 0.1;
-var farClip = 1000;
-var camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearClip, farClip);
-camera.position.z = 5; // So we can see things that are placed at (0, 0, 0)
-
-var renderer = new THREE.CSS3DRenderer();
-renderer.setSize(w, h);
-document.body.appendChild(renderer.domElement);
-
-var controls = new THREE.TrackballControls( camera );
-controls.rotateSpeed = 6.0;
-controls.zoomSpeed = 1.2;
-controls.panSpeed = 0.8;
-controls.noZoom = false;
-controls.noPan = false;
-controls.staticMoving = true;
-controls.dynamicDampingFactor = 0.3;
-controls.keys = [ 65, 83, 68 ];
-controls.addEventListener( 'change', render );
-
 
 // -- ADD YOUTUBE VIDEOS -------------------------------------------------------
 
@@ -92,10 +64,52 @@ for (var i = 0; i < 8; i += 1) {
 		scene.add(object);	
 	}
 
+// -- THREEJS SETUP ------------------------------------------------------------
 
+function initScene() {	
+	cssScene = new THREE.Scene();
+	glScene = new THREE.Scene();
 
+	raycaster = new THREE.Raycaster();
+
+	var fov = 80;
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+	var aspectRatio = w / h;
+	var nearClip = 0.1;
+	var farClip = 2000;
+	camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearClip, farClip);
+	camera.position.z = 400;
+
+	css3dRenderer = new THREE.CSS3DRenderer();
+	css3dRenderer.setSize(w, h);
+	css3dRenderer.domElement.style.position = "absolute";
+	css3dRenderer.domElement.style.top = "0";
+	document.body.appendChild(css3dRenderer.domElement);
+
+	glRenderer = new THREE.WebGLRenderer({ alpha:true });
+	glRenderer.setSize(w, h);
+	glRenderer.domElement.style.position = "absolute";
+	glRenderer.domElement.style.top = "0";
+	glRenderer.domElement.style.zIndex = 1;
+	document.body.appendChild(glRenderer.domElement);
+
+	controls = new THREE.TrackballControls(camera);
+	controls.rotateSpeed = 6.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = true;
+	controls.noPan = true;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+
+	createVideoSphere();
 }
 
+function createVideoSphere() {
+}
+
+initScene();
 
 
 
@@ -107,4 +121,3 @@ for (var i = 0; i < 8; i += 1) {
 
 function render() {
 }
-
