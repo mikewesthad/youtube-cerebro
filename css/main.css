@@ -1,0 +1,27 @@
+html, body, canvas { 
+  width: 100%; 
+  height: 100%; 
+  padding: 0; 
+  margin: 0; 
+}
+
+#loading-progress {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10em;
+}
+
+.video-placeholder {
+  position: relative;
+  background-color: black;
+}
+
+.video-placeholder img {
+  width: 25%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
