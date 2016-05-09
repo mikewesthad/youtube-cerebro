@@ -4,26 +4,6 @@ var cssScene, glScene, camera, glRenderer, css3dRenderer, controls, raycaster;
 var isDebug = false;
 var interactiveVideos = [];
 
-var radius = 600;
-var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
-for (var i = 0; i < 8; i += 1) {
-	var angle = i * Math.PI / 4;
-
-	// Circle in YZ plane
-	var x = 0;
-	var y = radius * Math.sin(angle);
-	var z = radius * Math.cos(angle);
-
-	for (var a = 0; a < 3; a += 1) {
-		var id = videoIds[THREE.Math.randInt(0, videoIds.length)];
-		var pos = new THREE.Vector3(x, y, z);
-		pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), a * 45);
-		// TODO: Miscalculated something small here - remove smudge factor
-		var object = createYouTubeObject(750, sideLength + 40, id);
-		object.position.copy(pos);
-		object.lookAt(new THREE.Vector3(0, 0, 0));
-		scene.add(object);	
-	}
 
 // -- THREEJS SETUP ------------------------------------------------------------
 
@@ -68,6 +48,35 @@ function initScene() {
 }
 
 function createVideoSphere() {
+	var radius = 600;
+	var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
+
+	// Outer loop generates positions along a ring in the YZ plane
+	var i = 0;
+	for (var r = 0; r < 8; r += 1) {
+		var angle = r * Math.PI / 4;
+		var x = 0;
+		var y = radius * Math.sin(angle);
+		var z = radius * Math.cos(angle);
+
+		// Inner loop creates multiple rings so that we end up with a sphere
+		for (var a = 0; a < 3; a += 1) {
+			// Top of the sphere and bottom of the sphere only need to be
+			// generated once.
+			if ((a !== 0) && (r === 2 || r === 6)) continue;
+
+			var id = videoIds[i];
+			var pos = new THREE.Vector3(x, y, z);
+			pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), a * 45);
+			// TODO: Miscalculated something small here - remove smudge factor
+			var interactive3dVideo = new Interactive3dVideo(pos, 750, sideLength + 40, id);
+			interactive3dVideo.addToScenes(cssScene, glScene);
+			interactiveVideos.push(interactive3dVideo);
+
+			i += 1;
+			if (i >= videoIds.length) i = 0;
+		}
+	}
 }
 
 initScene();
