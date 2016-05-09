@@ -3,26 +3,22 @@
   <head>
     <meta charset="UTF-8">
     <title>Youtube Cerebro</title>
-    <style>
-      html, body, canvas { 
-        width: 100%; 
-        height: 100%; 
-        padding: 0; 
-        margin: 0; 
-      }
-    </style>
+    <link rel="stylesheet" href="css/main.css">
   </head>
-  <body>    
+  <body>
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r76/three.min.js"></script>
     <script src="three.js/CSS3DRenderer.js"></script>
     <script src="three.js/TrackballControls.js"></script>
 
     <!-- Custom JS -->
+    <script src="js/helper-functions.js"></script>
+    <script src="js/tween.js"></script>
     <script src="js/video-ids.js"></script>
+    <script src="js/interactive-3d-video.js"></script>
     <script src="js/main.js"></script>
   
     <!-- YouTube iframe API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://www.youtube.com/iframe_api" async></script>
   </body>
 </html>

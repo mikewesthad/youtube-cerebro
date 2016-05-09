@@ -1,185 +1,164 @@
+// -- GLOBALS ------------------------------------------------------------------
+
+var cssScene, glScene, camera, glRenderer, css3dRenderer, controls, raycaster;
+var isDebug = false;
+var interactiveVideos = [];
+
+
 // -- THREEJS SETUP ------------------------------------------------------------
 
-var scene = new THREE.Scene();
+function initScene() {	
+	cssScene = new THREE.Scene();
+	glScene = new THREE.Scene();
 
-var fov = 75;
-var w = window.innerWidth;
-var h = window.innerHeight;
-var aspectRatio = w / h;
-var nearClip = 0.1;
-var farClip = 1000;
-var camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearClip, farClip);
-camera.position.z = 5; // So we can see things that are placed at (0, 0, 0)
+	raycaster = new THREE.Raycaster();
 
-var renderer = new THREE.CSS3DRenderer();
-renderer.setSize(w, h);
-document.body.appendChild(renderer.domElement);
+	var fov = 80;
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+	var aspectRatio = w / h;
+	var nearClip = 0.1;
+	var farClip = 2000;
+	camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearClip, farClip);
+	camera.position.z = 400;
 
-var controls = new THREE.TrackballControls( camera );
-controls.rotateSpeed = 6.0;
-controls.zoomSpeed = 1.2;
-controls.panSpeed = 0.8;
-controls.noZoom = false;
-controls.noPan = false;
-controls.staticMoving = true;
-controls.dynamicDampingFactor = 0.3;
-controls.keys = [ 65, 83, 68 ];
-controls.addEventListener( 'change', render );
+	css3dRenderer = new THREE.CSS3DRenderer();
+	css3dRenderer.setSize(w, h);
+	css3dRenderer.domElement.style.position = "absolute";
+	css3dRenderer.domElement.style.top = "0";
+	document.body.appendChild(css3dRenderer.domElement);
 
+	glRenderer = new THREE.WebGLRenderer({ alpha:true });
+	glRenderer.setSize(w, h);
+	glRenderer.domElement.style.position = "absolute";
+	glRenderer.domElement.style.top = "0";
+	glRenderer.domElement.style.zIndex = 1;
+	document.body.appendChild(glRenderer.domElement);
 
-// -- ADD YOUTUBE VIDEOS -------------------------------------------------------
+	controls = new THREE.TrackballControls(camera);
+	controls.rotateSpeed = 6.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = true;
+	controls.noPan = true;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
 
-function createYouTubeObject(width, height, videoId) {
-	// Div to hold everything
-	var divContainer = document.createElement("div");
-	// Div to capture all mouse events
-	var pointerCaptureDiv = document.createElement("div");
-	pointerCaptureDiv.style.position = "absolute";
-	pointerCaptureDiv.style.background = "transparent";
-	pointerCaptureDiv.style.zIndex = 1; // Sit on top of iframe
-	pointerCaptureDiv.style.width = width + "px";
-	pointerCaptureDiv.style.height = height + "px";
-	// YouTube video iframe
-	var iframe = document.createElement("iframe");
-	iframe.style.width = width + "px";
-	iframe.style.height = height + "px";
-	iframe.style.border = "0px";
-	// https://developers.google.com/youtube/player_parameters?playerVersion=HTML5#Parameters
-	var parameters = {
-		autoplay: 0,
-		controls: 0,
-		disablekb: 1,
-		enablejsapi: 1,
-		loop: 1,
-		showinfo: 0,
-		cc_load_policy: 1
-	};
-	var url = "https://www.youtube.com/embed/" + videoId + "?";
-	for (var key in parameters) {
-		url += key + "=" + parameters[key] + "&";
-	}
-	url = url.slice(0, -1); // Remove trailing "&"
-	iframe.src = url;
-	// Put the DOM elements together
-	divContainer.appendChild(pointerCaptureDiv);
-	divContainer.appendChild(iframe);
-	// Return a CSS3DObject
-	return new THREE.CSS3DObject(divContainer);
+	createVideoSphere();
 }
 
-var radius = 600;
-var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
-for (var i = 0; i < 8; i += 1) {
-	var angle = i * Math.PI / 4;
+function createVideoSphere() {
+	var radius = 600;
+	var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
 
-	// Circle in YZ plane
-	var x = 0;
-	var y = radius * Math.sin(angle);
-	var z = radius * Math.cos(angle);
+	// Outer loop generates positions along a ring in the YZ plane
+	var i = 0;
+	for (var r = 0; r < 8; r += 1) {
+		var angle = r * Math.PI / 4;
+		var x = 0;
+		var y = radius * Math.sin(angle);
+		var z = radius * Math.cos(angle);
 
-	for (var a = 0; a < 3; a += 1) {
-		var id = videoIds[THREE.Math.randInt(0, videoIds.length)];
-		var pos = new THREE.Vector3(x, y, z);
-		pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), a * 45);
-		// TODO: Miscalculated something small here - remove smudge factor
-		var object = createYouTubeObject(750, sideLength + 40, id);
-		object.position.copy(pos);
-		object.lookAt(new THREE.Vector3(0, 0, 0));
-		scene.add(object);	
+		// Inner loop creates multiple rings so that we end up with a sphere
+		for (var a = 0; a < 3; a += 1) {
+			// Top of the sphere and bottom of the sphere only need to be
+			// generated once.
+			if ((a !== 0) && (r === 2 || r === 6)) continue;
+
+			var id = videoIds[i];
+			var pos = new THREE.Vector3(x, y, z);
+			pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), a * 45);
+			// TODO: Miscalculated something small here - remove smudge factor
+			var interactive3dVideo = new Interactive3dVideo(pos, 750, sideLength + 40, id);
+			interactive3dVideo.addToScenes(cssScene, glScene);
+			interactiveVideos.push(interactive3dVideo);
+
+			i += 1;
+			if (i >= videoIds.length) i = 0;
+		}
 	}
+}
+
+initScene();
 
 
+// -- LOAD VIDEOS --------------------------------------------------------------
 
+// Use YouTube iframe API to load videos.  This allows the app to adjust video
+// volume, playback speed, etc.
+// 	https://developers.google.com/youtube/player_parameters#Manual_IFrame_Embeds
+
+// This global function is what the YouTube API hooks into
+function onYouTubeIframeAPIReady() {
+	// Leave spinning loading wheel on screen for a second before starting
+	window.setTimeout(loadVideos, 1000);
+}
+
+function loadVideos() {
+	delayedForEach(interactiveVideos, 0, function (interactiveVideo) {	
+		var placeholder = interactiveVideo.getVideoPlaceholder();
+		var player = new YT.Player(placeholder, {
+			width: "480",
+			height: "360",
+			videoId: interactiveVideo.getVideoId(),
+			playerVars: {
+				autoplay: 0,
+				controls: 0,
+				disablekb: 1,
+				enablejsapi: 1,
+				showinfo: 0,
+				cc_load_policy: 1,
+				fs: 0,
+				iv_load_policy: 1,
+				modestbranding: 1
+			},
+			events: {
+				"onReady": interactiveVideo.onPlayerReady.bind(interactiveVideo),
+				"onStateChange": interactiveVideo.onPlayerStateChange.bind(interactiveVideo)
+			}
+		});
+	});
 }
 
 
 // -- LOOP & RENDER ------------------------------------------------------------
 
-function createGameLoop(loopFunction) {
-	var totalTime = 0;
-	var elapsedTime = 0;
-	var previousTimestamp = 0;
-
-	function wrappedLoopFunction(currentTimestamp) {
-		currentTimestamp /= 1000; // Convert time to seconds
-		elapsedTime = currentTimestamp - previousTimestamp;
-		previousTimestamp = currentTimestamp;
-		// Cap the elapsed time at 1 second - useful if the user switches tabs
-		elapsedTime = Math.min(elapsedTime, 1);
-		totalTime += elapsedTime;
-
-		// Call the game logic function
-		loopFunction(elapsedTime, totalTime);
-
-		requestAnimationFrame(wrappedLoopFunction);
-	}
-	requestAnimationFrame(wrappedLoopFunction);
-	
-}
-
-createGameLoop(loop);
-
-function loop(elapsedSeconds, currentTime) {
-	controls.update();
-	render();	
-}
+var mouse = {x: 0, y: 0};
 
 function render() {
-	renderer.render(scene, camera);
+	// Set up next iteration
+	window.requestAnimationFrame(render);
+	// Update the youtube video objects	
+	for (var i = 0; i < interactiveVideos.length; i += 1) {
+		interactiveVideos[i].update();
+	}
+	// Update controls
+	controls.update();
+	// Update the raycaster using the camera and mouse position	
+	raycaster.setFromCamera(mouse, camera);
+	// Find the objects that intersect with the raycaster
+	var intersects = raycaster.intersectObjects(glScene.children);
+	if (intersects.length) {
+		var firstMatch = intersects[0];
+		for (var i = 0; i < interactiveVideos.length; i += 1) {
+			if (interactiveVideos[i].plane.uuid === firstMatch.object.uuid) {
+				interactiveVideos[i].select();
+			}
+			else {
+				interactiveVideos[i].deselect();
+			}
+		}
+	}
+	css3dRenderer.render(cssScene, camera);
+	glRenderer.render(glScene, camera);
 }
 
+function onMouseMove(event) {
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;		
+}
 
-
-// // TODO: Use youtube iframe API to control videos and their volume
-// // 	https://developers.google.com/youtube/player_parameters#Manual_IFrame_Embeds
-// var videos = [];
-// var videoParameters = {
-// 	autoplay: 1,
-// 	controls: 0,
-// 	disablekb: 1,
-// 	enablejsapi: 1,
-// 	showinfo: 0,
-// 	cc_load_policy: 1,
-// 	fs: 0,
-// 	iv_load_policy: 1,
-// 	modestbranding: 1
-// };
-
-// function onYouTubeIframeAPIReady() {
-
-// 	var tempDiv = document.createElement("div");
-// 	document.body.appendChild(tempDiv);
-
-// 	for (var i = 0; i < videoIds.length; i += 1) {
-
-// 		var videoId = videoIds[i];
-// 		var player = new YT.Player(tempDiv, {
-// 			width: "480",
-// 			height: "360",
-// 			videoId: videoId,
-// 			playerVars: videoParameters,
-// 			events: {
-// 				'onReady': onPlayerReady,
-// 				'onStateChange': onPlayerStateChange
-// 			}
-// 		});
-
-// 		videos.push({
-// 			videoId: videoId,
-// 			iframe: tempDiv,
-// 			player: player
-// 		});
-// 	}
-// }
-
-// function onPlayerReady(event) {
-// 	event.target.playVideo();
-// 	event.target.setVolume(10);
-// }
-
-// function onPlayerStateChange(event) {
-// 	// Restart any players that end
-// 	if (event.data === YT.PlayerState.ENDED) {
-// 		event.target.playVideo();
-// 	}
-// }
+window.addEventListener( 'mousemove', onMouseMove, false );
+render();
