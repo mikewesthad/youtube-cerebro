@@ -1,4 +1,5 @@
 // -- THREEJS SETUP ------------------------------------------------------------
+// -- GLOBALS ------------------------------------------------------------------
 
 var scene = new THREE.Scene();
 
@@ -66,6 +67,9 @@ function createYouTubeObject(width, height, videoId) {
 	// Return a CSS3DObject
 	return new THREE.CSS3DObject(divContainer);
 }
+var cssScene, glScene, camera, glRenderer, css3dRenderer, controls, raycaster;
+var isDebug = false;
+var interactiveVideos = [];
 
 var radius = 600;
 var sideLength = 2 * radius / Math.sqrt(4 + 2 * Math.sqrt(2));
@@ -103,5 +107,4 @@ for (var i = 0; i < 8; i += 1) {
 
 function render() {
 }
-
 
