@@ -88,6 +88,15 @@ initScene();
 }
 
 
+var mouse = {x: 0, y: 0};
 
 function render() {
 }
+function onMouseMove(event) {
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;		
+}
+
+window.addEventListener( 'mousemove', onMouseMove, false );
