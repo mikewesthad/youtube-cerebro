@@ -93,39 +93,15 @@ for (var i = 0; i < 8; i += 1) {
 }
 
 
-// -- LOOP & RENDER ------------------------------------------------------------
 
-function createGameLoop(loopFunction) {
-	var totalTime = 0;
-	var elapsedTime = 0;
-	var previousTimestamp = 0;
 
-	function wrappedLoopFunction(currentTimestamp) {
-		currentTimestamp /= 1000; // Convert time to seconds
-		elapsedTime = currentTimestamp - previousTimestamp;
-		previousTimestamp = currentTimestamp;
-		// Cap the elapsed time at 1 second - useful if the user switches tabs
-		elapsedTime = Math.min(elapsedTime, 1);
-		totalTime += elapsedTime;
 
-		// Call the game logic function
-		loopFunction(elapsedTime, totalTime);
 
-		requestAnimationFrame(wrappedLoopFunction);
-	}
-	requestAnimationFrame(wrappedLoopFunction);
-	
 }
 
-createGameLoop(loop);
 
-function loop(elapsedSeconds, currentTime) {
-	controls.update();
-	render();	
-}
 
 function render() {
-	renderer.render(scene, camera);
 }
 
 
