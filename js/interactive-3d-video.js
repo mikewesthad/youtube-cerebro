@@ -112,7 +112,6 @@ Interactive3dVideo.prototype.update = function () {
 		else {
 			var volume = this.volumeTween.getValue();
 			this.player.setVolume(volume);
-			console.log(this.videoId, volume)
 		}
 	}
 };
