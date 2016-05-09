@@ -26,3 +26,4 @@ var videoIds = [
 	"5mZby1Cup6M",
 	"u9oj-iQNXKQ"
 ];
+videoIds = shuffleArray(videoIds);
