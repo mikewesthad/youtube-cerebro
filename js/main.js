@@ -88,10 +88,38 @@ initScene();
 }
 
 
+// -- LOOP & RENDER ------------------------------------------------------------
+
 var mouse = {x: 0, y: 0};
 
 function render() {
+	// Set up next iteration
+	window.requestAnimationFrame(render);
+	// Update the youtube video objects	
+	for (var i = 0; i < interactiveVideos.length; i += 1) {
+		interactiveVideos[i].update();
+	}
+	// Update controls
+	controls.update();
+	// Update the raycaster using the camera and mouse position	
+	raycaster.setFromCamera(mouse, camera);
+	// Find the objects that intersect with the raycaster
+	var intersects = raycaster.intersectObjects(glScene.children);
+	if (intersects.length) {
+		var firstMatch = intersects[0];
+		for (var i = 0; i < interactiveVideos.length; i += 1) {
+			if (interactiveVideos[i].plane.uuid === firstMatch.object.uuid) {
+				interactiveVideos[i].select();
+			}
+			else {
+				interactiveVideos[i].deselect();
+			}
+		}
+	}
+	css3dRenderer.render(cssScene, camera);
+	glRenderer.render(glScene, camera);
 }
+
 function onMouseMove(event) {
 	// calculate mouse position in normalized device coordinates
 	// (-1 to +1) for both components
@@ -100,3 +128,4 @@ function onMouseMove(event) {
 }
 
 window.addEventListener( 'mousemove', onMouseMove, false );
+render();
