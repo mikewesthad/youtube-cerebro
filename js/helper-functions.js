@@ -31,3 +31,15 @@ function shuffleArray(array) {
 	return array;
 }
 
+// Callback is given: currentValue, index, array
+function delayedForEach(array, delay, callback) {
+	var i = 0;
+	function iterate() {
+		callback(array[i], i, array);
+		i += 1;
+		if (i < array.length) {
+			window.setTimeout(iterate, delay);
+		}
+	}
+	if (array.length > 0) iterate();
+}

@@ -82,9 +82,42 @@ function createVideoSphere() {
 initScene();
 
 
+// -- LOAD VIDEOS --------------------------------------------------------------
 
+// Use YouTube iframe API to load videos.  This allows the app to adjust video
+// volume, playback speed, etc.
+// 	https://developers.google.com/youtube/player_parameters#Manual_IFrame_Embeds
 
+// This global function is what the YouTube API hooks into
+function onYouTubeIframeAPIReady() {
+	// Leave spinning loading wheel on screen for a second before starting
+	window.setTimeout(loadVideos, 1000);
+}
 
+function loadVideos() {
+	delayedForEach(interactiveVideos, 0, function (interactiveVideo) {	
+		var placeholder = interactiveVideo.getVideoPlaceholder();
+		var player = new YT.Player(placeholder, {
+			width: "480",
+			height: "360",
+			videoId: interactiveVideo.getVideoId(),
+			playerVars: {
+				autoplay: 0,
+				controls: 0,
+				disablekb: 1,
+				enablejsapi: 1,
+				showinfo: 0,
+				cc_load_policy: 1,
+				fs: 0,
+				iv_load_policy: 1,
+				modestbranding: 1
+			},
+			events: {
+				"onReady": interactiveVideo.onPlayerReady.bind(interactiveVideo),
+				"onStateChange": interactiveVideo.onPlayerStateChange.bind(interactiveVideo)
+			}
+		});
+	});
 }
 
 
